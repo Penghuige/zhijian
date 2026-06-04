@@ -288,10 +288,10 @@ async def upload_file_handler(
             file.file,
             filename,
             {
-                'OpenWebUI-User-Email': user.email,
-                'OpenWebUI-User-Id': user.id,
-                'OpenWebUI-User-Name': user.name,
-                'OpenWebUI-File-Id': id,
+                'Zhijian-User-Email': user.email,
+                'Zhijian-User-Id': user.id,
+                'Zhijian-User-Name': user.name,
+                'Zhijian-File-Id': id,
             },
         )
 

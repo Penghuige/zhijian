@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # ---------------------------------------------------------------------------
-# Build and run the Open WebUI Docker container locally.
+# Build and run the 职鉴 Docker container locally.
 # ---------------------------------------------------------------------------
 
 readonly IMAGE="open-webui"
@@ -29,4 +29,4 @@ docker run -d \
 echo "Cleaning up dangling images..."
 docker image prune -f
 
-echo "Open WebUI is running at http://localhost:${HOST_PORT}"
+echo "职鉴 is running at http://localhost:${HOST_PORT}"

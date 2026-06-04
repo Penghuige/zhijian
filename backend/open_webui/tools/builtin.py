@@ -1,5 +1,5 @@
 """
-Built-in tools for Open WebUI.
+Built-in tools for 职鉴.
 
 These tools are automatically available when native function calling is enabled.
 
