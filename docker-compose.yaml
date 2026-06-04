@@ -16,6 +16,9 @@ services:
       dockerfile: Dockerfile
     image: ghcr.io/open-webui/open-webui:${WEBUI_DOCKER_TAG-main}
     container_name: open-webui
+    command: >
+      bash -lc "python -m pip install --no-cache-dir -r /app/backend/requirements.txt
+      && bash start.sh"
     volumes:
       - ./backend:/app/backend
       - open-webui:/app/backend/data
