@@ -905,7 +905,7 @@ app.state.config.AUTOMATION_MIN_INTERVAL = AUTOMATION_MIN_INTERVAL
 app.state.config.ENABLE_CHANNELS = ENABLE_CHANNELS
 app.state.config.ENABLE_CALENDAR = ENABLE_CALENDAR
 app.state.config.ENABLE_NOTES = ENABLE_NOTES
-app.state.config.ENABLE_COMMUNITY_SHARING = ENABLE_COMMUNITY_SHARING
+app.state.config.ENABLE_COMMUNITY_SHARING = False
 app.state.config.ENABLE_MESSAGE_RATING = ENABLE_MESSAGE_RATING
 app.state.config.ENABLE_USER_WEBHOOKS = ENABLE_USER_WEBHOOKS
 app.state.config.ENABLE_USER_STATUS = ENABLE_USER_STATUS
@@ -2430,7 +2430,7 @@ async def get_app_config(request: Request):
                     'enable_code_interpreter': app.state.config.ENABLE_CODE_INTERPRETER,
                     'enable_image_generation': app.state.config.ENABLE_IMAGE_GENERATION,
                     'enable_autocomplete_generation': app.state.config.ENABLE_AUTOCOMPLETE_GENERATION,
-                    'enable_community_sharing': app.state.config.ENABLE_COMMUNITY_SHARING,
+                    'enable_community_sharing': False,
                     'enable_message_rating': app.state.config.ENABLE_MESSAGE_RATING,
                     'enable_user_webhooks': app.state.config.ENABLE_USER_WEBHOOKS,
                     'enable_user_status': app.state.config.ENABLE_USER_STATUS,

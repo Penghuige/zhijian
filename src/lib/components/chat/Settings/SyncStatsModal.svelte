@@ -369,16 +369,6 @@
 			</div>
 
 			<div class="px-5 pt-2 pb-5">
-				<div class="text-sm text-gray-500 dark:text-gray-400">
-					{$i18n.t('Do you want to sync your usage stats with 职鉴 Community?')}
-				</div>
-
-				<div class="mt-2 text-xs text-gray-500">
-					{$i18n.t(
-						'Participate in community leaderboards and evaluations! Syncing aggregated usage stats helps drive research and improvements to 职鉴. Your privacy is paramount: no message content is ever shared.'
-					)}
-				</div>
-
 				<div class="mt-3 text-xs text-gray-500">
 					<div class="font-medium text-gray-900 dark:text-gray-100 mb-1">
 						{$i18n.t('What is shared:')}
