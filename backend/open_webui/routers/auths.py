@@ -64,6 +64,7 @@ from open_webui.utils.auth import (
     create_api_key,
     create_token,
     decode_token,
+    ensure_local_admin_user,
     get_admin_user,
     get_current_user,
     get_http_authorization_cred,
@@ -176,6 +177,8 @@ async def get_session_user(
         token = request.cookies.get('token')
     if token is None and getattr(request.state, 'token', None):
         token = request.state.token.credentials
+    if token is None and not WEBUI_AUTH:
+        return await create_session_response(request, user, db, response, set_cookie=True)
     data = decode_token(token) if token else None
 
     expires_at = None
@@ -618,32 +621,7 @@ async def signin(
                     log.warning(f'Ignoring invalid trusted role header value: {trusted_role}')
 
     elif WEBUI_AUTH == False:
-        admin_email = 'admin@localhost'
-        admin_password = 'admin'
-
-        if await Users.get_user_by_email(admin_email.lower(), db=db):
-            user = await Auths.authenticate_user(
-                admin_email.lower(),
-                lambda pw: verify_password(admin_password, pw),
-                db=db,
-            )
-        else:
-            if await Users.has_users(db=db):
-                raise HTTPException(400, detail=ERROR_MESSAGES.EXISTING_USERS)
-
-            await signup_handler(
-                request,
-                admin_email,
-                admin_password,
-                'User',
-                db=db,
-            )
-
-            user = await Auths.authenticate_user(
-                admin_email.lower(),
-                lambda pw: verify_password(admin_password, pw),
-                db=db,
-            )
+        user = await ensure_local_admin_user(db=db)
     else:
         if signin_rate_limiter.is_limited(form_data.email.lower()):
             raise HTTPException(

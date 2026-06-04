@@ -600,7 +600,7 @@ else:
 # Auth
 ####################################
 
-WEBUI_AUTH = os.getenv('WEBUI_AUTH', 'True').lower() == 'true'
+WEBUI_AUTH = os.getenv('WEBUI_AUTH', 'False').lower() == 'true'
 
 ENABLE_INITIAL_ADMIN_SIGNUP = os.getenv('ENABLE_INITIAL_ADMIN_SIGNUP', 'False').lower() == 'true'
 ENABLE_SIGNUP_PASSWORD_CONFIRMATION = os.getenv('ENABLE_SIGNUP_PASSWORD_CONFIRMATION', 'False').lower() == 'true'

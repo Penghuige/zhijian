@@ -30,6 +30,7 @@ from open_webui.env import (
     REDIS_KEY_PREFIX,
     STATIC_DIR,
     TRUSTED_SIGNATURE_KEY,
+    WEBUI_AUTH,
     WEBUI_AUTH_TRUSTED_EMAIL_HEADER,
     WEBUI_SECRET_KEY,
     pk,
@@ -160,6 +161,28 @@ bearer_security = HTTPBearer(auto_error=False)
 def get_password_hash(password: str) -> str:
     """Hash a password using bcrypt"""
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+
+async def ensure_local_admin_user(db=None):
+    admin_email = 'admin@localhost'
+    admin_password = 'admin'
+
+    user = await Users.get_user_by_email(admin_email, db=db)
+    if user is None:
+        user = await Auths.insert_new_auth(
+            email=admin_email,
+            password=get_password_hash(admin_password),
+            name='管理员',
+            role='admin',
+            db=db,
+        )
+    elif user.role != 'admin':
+        user = await Users.update_user_role_by_id(user.id, 'admin', db=db)
+
+    if user is None:
+        raise HTTPException(status_code=500, detail=ERROR_MESSAGES.CREATE_USER_ERROR)
+
+    return user
 
 
 def validate_password(password: str) -> bool:
@@ -309,6 +332,13 @@ async def get_current_user(
     # Fallback to request.state.token (set by middleware, e.g. for x-api-key)
     if token is None and hasattr(request.state, 'token') and request.state.token:
         token = request.state.token.credentials
+
+    if token is None and not WEBUI_AUTH:
+        user = await ensure_local_admin_user()
+        import asyncio
+
+        asyncio.create_task(Users.update_last_active_by_id(user.id))
+        return user
 
     if token is None:
         raise HTTPException(status_code=401, detail='Not authenticated')

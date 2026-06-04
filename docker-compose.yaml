@@ -24,6 +24,10 @@ services:
       OLLAMA_BASE_URL: http://ollama:11434
       WEBUI_SECRET_KEY: ''
       WEBUI_NAME: 职鉴
+      WEBUI_AUTH: 'false'
+      ENABLE_LOGIN_FORM: 'false'
+      ENABLE_SIGNUP: 'false'
+      DEFAULT_USER_ROLE: admin
       OFFLINE_MODE: 'true'
       ENABLE_VERSION_UPDATE_CHECK: 'false'
       DEFAULT_PROMPT_SUGGESTIONS: >-

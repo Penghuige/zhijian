@@ -2470,7 +2470,7 @@ ENABLE_SIGNUP = ConfigVar(
 ENABLE_LOGIN_FORM = ConfigVar(
     'ENABLE_LOGIN_FORM',
     'ui.enable_login_form',
-    os.getenv('ENABLE_LOGIN_FORM', 'True').lower() == 'true',
+    (False if not WEBUI_AUTH else os.getenv('ENABLE_LOGIN_FORM', 'True').lower() == 'true'),
 )
 
 ENABLE_PASSWORD_CHANGE_FORM = ConfigVar(
@@ -2567,7 +2567,7 @@ DEFAULT_MODEL_PARAMS = ConfigVar(
 DEFAULT_USER_ROLE = ConfigVar(
     'DEFAULT_USER_ROLE',
     'ui.default_user_role',
-    os.getenv('DEFAULT_USER_ROLE', 'pending'),
+    os.getenv('DEFAULT_USER_ROLE', 'admin' if not WEBUI_AUTH else 'pending'),
 )
 
 DEFAULT_GROUP_ID = ConfigVar(
