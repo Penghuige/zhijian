@@ -179,6 +179,17 @@
 
 	let taskIds = null;
 
+	let boundSocket = null;
+
+	const bindChatSocket = (nextSocket) => {
+		if (boundSocket === nextSocket) {
+			return;
+		}
+		boundSocket?.off('events', chatEventHandler);
+		boundSocket = nextSocket;
+		boundSocket?.on('events', chatEventHandler);
+	};
+
 	// Chat Input
 	let prompt = '';
 	let chatFiles = [];
@@ -490,7 +501,9 @@
 	const chatEventHandler = async (event, cb) => {
 		console.log(event);
 
-		if (event.chat_id === $chatId) {
+		const hasLocalMessage = Boolean(history.messages[event.message_id]);
+		const isCurrentChatEvent = event.chat_id === $chatId || hasLocalMessage;
+		if (isCurrentChatEvent) {
 			await tick();
 			let message = history.messages[event.message_id];
 
@@ -763,11 +776,12 @@
 		} catch {}
 	};
 
+	$: bindChatSocket($socket);
+
 	onMount(() => {
 		loading = true;
 		console.log('mounted');
 		window.addEventListener('message', onMessageHandler);
-		$socket?.on('events', chatEventHandler);
 
 		$audioQueue?.destroy();
 
@@ -890,7 +904,7 @@
 				showControlsSubscribe();
 				selectedFolderSubscribe();
 				window.removeEventListener('message', onMessageHandler);
-				$socket?.off('events', chatEventHandler);
+				boundSocket?.off('events', chatEventHandler);
 				audioQueueInstance?.destroy();
 				audioQueue.set(null);
 			} catch (e) {
