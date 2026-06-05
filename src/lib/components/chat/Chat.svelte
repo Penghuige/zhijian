@@ -6,6 +6,7 @@
 	import { getContext, onDestroy, onMount, tick } from 'svelte';
 	import { fade } from 'svelte/transition';
 	const i18n: Writable<i18nType> = getContext('i18n');
+	const hideChatAdvancedSettings = true;
 
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
@@ -489,7 +490,10 @@
 	const chatEventHandler = async (event, cb) => {
 		console.log(event);
 
-		if (event.chat_id === $chatId) {
+		const hasLocalMessage = Boolean(history.messages[event.message_id]);
+		const isCurrentChatEvent = event.chat_id === $chatId || hasLocalMessage;
+
+		if (isCurrentChatEvent) {
 			await tick();
 			let message = history.messages[event.message_id];
 
@@ -3250,7 +3254,8 @@
 					</div>
 				</Pane>
 
-				<ChatControls
+				{#if !hideChatAdvancedSettings}
+					<ChatControls
 					bind:this={controlPaneComponent}
 					bind:history
 					bind:chatFiles
@@ -3270,8 +3275,9 @@
 					{stopResponse}
 					{showMessage}
 					{eventTarget}
-					{codeInterpreterEnabled}
-				/>
+						{codeInterpreterEnabled}
+					/>
+				{/if}
 			</PaneGroup>
 		</div>
 	{:else if loading}

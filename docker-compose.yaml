@@ -26,13 +26,15 @@ services:
     ports:
       - ${OPEN_WEBUI_PORT-8000}:8080
     environment:
-      OLLAMA_BASE_URL: http://ollama:11434
+      ENABLE_OLLAMA_API: 'false'
+      OLLAMA_BASE_URL: ''
+      OLLAMA_BASE_URLS: ''
       WEBUI_SECRET_KEY: ''
       WEBUI_NAME: 职鉴
       WEBUI_AUTH: 'false'
       ENABLE_LOGIN_FORM: 'false'
       ENABLE_SIGNUP: 'false'
-      DEFAULT_USER_ROLE: admin
+      DEFAULT_USER_ROLE: user
       OFFLINE_MODE: 'true'
       ENABLE_VERSION_UPDATE_CHECK: 'false'
       ENABLE_COMMUNITY_SHARING: 'false'

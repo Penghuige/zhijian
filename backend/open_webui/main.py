@@ -884,7 +884,7 @@ app.state.config.DEFAULT_MODEL_PARAMS = DEFAULT_MODEL_PARAMS
 app.state.config.DEFAULT_PROMPT_SUGGESTIONS = DEFAULT_PROMPT_SUGGESTIONS
 app.state.config.DEFAULT_USER_ROLE = DEFAULT_USER_ROLE
 if not WEBUI_AUTH:
-    app.state.config.DEFAULT_USER_ROLE = 'admin'
+    app.state.config.DEFAULT_USER_ROLE = 'user'
 app.state.config.DEFAULT_GROUP_ID = DEFAULT_GROUP_ID
 
 app.state.config.PENDING_USER_OVERLAY_CONTENT = PENDING_USER_OVERLAY_CONTENT
@@ -1797,6 +1797,14 @@ async def chat_completion(
 
         if is_new_chat:
             metadata['chat_id'] = str(uuid4())
+
+        if user and user.email == 'guest@localhost' and user_message:
+            guest_message_count = await Chats.count_user_messages_by_user_id(user.id)
+            if guest_message_count >= 5:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail='游客最多只能进行 5 次问答。',
+                )
 
         if metadata.get('chat_id') and user:
             chat_id = metadata['chat_id']
