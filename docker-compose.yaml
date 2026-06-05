@@ -20,6 +20,7 @@ services:
       bash -lc "python -m pip install --no-cache-dir -r /app/backend/requirements.txt
       && bash start.sh"
     volumes:
+      - ./build:/app/build
       - ./backend:/app/backend
       - open-webui:/app/backend/data
     ports:

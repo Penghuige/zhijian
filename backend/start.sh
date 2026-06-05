@@ -45,6 +45,16 @@ if [[ -z "${WEBUI_SECRET_KEY:-}" && -z "${WEBUI_JWT_SECRET_KEY:-}" ]]; then
   WEBUI_SECRET_KEY=$(cat "$KEY_FILE")
 fi
 
+# ── Database migrations ─────────────────────────────────────────────────────
+
+if [[ "${RUN_DB_MIGRATIONS:-true}" == "true" ]]; then
+  echo "Running database migrations..."
+  (
+    cd "$SCRIPT_DIR/open_webui"
+    WEBUI_SECRET_KEY="${WEBUI_SECRET_KEY:-}" alembic -c alembic.ini upgrade head
+  )
+fi
+
 # ── Ollama (bundled Docker image) ────────────────────────────────────────────
 
 if [[ "${USE_OLLAMA_DOCKER,,}" == "true" ]]; then

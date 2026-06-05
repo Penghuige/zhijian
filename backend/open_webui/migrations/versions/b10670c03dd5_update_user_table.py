@@ -72,11 +72,16 @@ def _convert_column_to_json(table: str, column: str):
     dialect = conn.dialect.name
 
     t = sa.table(table, sa.column('id', sa.Text), sa.column(column, sa.Text))
-    t_json = sa.column(f'{column}_json', sa.JSON)
+    temp_column = f'{column}_json'
+    t_update = sa.table(table, sa.column('id'), sa.column(temp_column, sa.JSON))
 
     # SQLite cannot ALTER COLUMN → must recreate column
     if dialect == 'sqlite':
-        op.add_column(table, sa.Column(f'{column}_json', sa.JSON(), nullable=True))
+        inspector = sa.inspect(conn)
+        existing_columns = {c['name'] for c in inspector.get_columns(table)}
+
+        if temp_column not in existing_columns:
+            op.add_column(table, sa.Column(temp_column, sa.JSON(), nullable=True))
 
         rows = conn.execute(sa.select(t.c.id, t.c[column])).fetchall()
 
@@ -90,13 +95,14 @@ def _convert_column_to_json(table: str, column: str):
                     parsed = None
 
             conn.execute(
-                sa.update(sa.table(table, sa.column('id'), t_json))
-                .where(sa.column('id') == uid)
-                .values({f'{column}_json': json.dumps(parsed) if parsed else None})
+                sa.update(t_update)
+                .where(t_update.c.id == uid)
+                .values({temp_column: json.dumps(parsed) if parsed else None})
             )
 
-        op.drop_column(table, column)
-        op.alter_column(table, f'{column}_json', new_column_name=column)
+        if column in existing_columns:
+            op.drop_column(table, column)
+        op.alter_column(table, temp_column, new_column_name=column)
 
     else:
         # PostgreSQL supports direct CAST
@@ -113,22 +119,23 @@ def _convert_column_to_text(table: str, column: str):
     dialect = conn.dialect.name
 
     t = sa.table(table, sa.column('id', sa.Text), sa.column(column))
-    t_text = sa.column(f'{column}_text', sa.Text)
+    temp_column = f'{column}_text'
+    t_update = sa.table(table, sa.column('id'), sa.column(temp_column, sa.Text))
 
     if dialect == 'sqlite':
-        op.add_column(table, sa.Column(f'{column}_text', sa.Text(), nullable=True))
+        op.add_column(table, sa.Column(temp_column, sa.Text(), nullable=True))
 
         rows = conn.execute(sa.select(t.c.id, t.c[column])).fetchall()
 
         for uid, raw in rows:
             conn.execute(
-                sa.update(sa.table(table, sa.column('id'), t_text))
-                .where(sa.column('id') == uid)
-                .values({f'{column}_text': json.dumps(raw) if raw else None})
+                sa.update(t_update)
+                .where(t_update.c.id == uid)
+                .values({temp_column: json.dumps(raw) if raw else None})
             )
 
         op.drop_column(table, column)
-        op.alter_column(table, f'{column}_text', new_column_name=column)
+        op.alter_column(table, temp_column, new_column_name=column)
 
     else:
         op.alter_column(
