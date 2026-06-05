@@ -57,6 +57,9 @@
 	</div>
 
 	<div class=" w-full p-4 px-5 text-gray-700 dark:text-gray-100">
+		<div class="mb-4 text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+			"职鉴"是由华南师范大学经济与管理学院就业研究与人工智能团队共同打造的智能职业推荐平台。平台依托专业职业知识库与智能体技术，结合用户的教育背景、能力特征和职业偏好，为用户提供职业匹配、岗位认知与发展方向建议，助力实现更加科学、高效的职业选择。
+		</div>
 		<div class=" overflow-y-scroll max-h-[30rem] scrollbar-hidden">
 			<div class="mb-3">
 				{#if changelog}
