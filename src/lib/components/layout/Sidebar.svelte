@@ -76,7 +76,9 @@
 	import HotkeyHint from '../common/HotkeyHint.svelte';
 
 	const BREAKPOINT = 768;
-	const DEFAULT_PINNED_ITEMS = ['notes', 'workspace'];
+	// Hide Notes and Workspace from the main navigation.
+	const HIDE_NOTES_AND_WORKSPACE_NAV = true;
+	const DEFAULT_PINNED_ITEMS = [];
 
 	let scrollTop = 0;
 
@@ -109,11 +111,17 @@
 	const isMenuItemVisible = (id) => {
 		switch (id) {
 			case 'notes':
+				if (HIDE_NOTES_AND_WORKSPACE_NAV) {
+					return false;
+				}
 				return (
 					($config?.features?.enable_notes ?? false) &&
 					($user?.role === 'admin' || ($user?.permissions?.features?.notes ?? true))
 				);
 			case 'workspace':
+				if (HIDE_NOTES_AND_WORKSPACE_NAV) {
+					return false;
+				}
 				return (
 					$user?.role === 'admin' ||
 					$user?.permissions?.workspace?.models ||
@@ -1188,7 +1196,7 @@
 					</Folder>
 				{/if}
 
-				{#if ($config?.features?.enable_notes ?? false) && ($user?.role === 'admin' || ($user?.permissions?.features?.notes ?? true)) && $pinnedNotes.length > 0}
+				{#if !HIDE_NOTES_AND_WORKSPACE_NAV && ($config?.features?.enable_notes ?? false) && ($user?.role === 'admin' || ($user?.permissions?.features?.notes ?? true)) && $pinnedNotes.length > 0}
 					<Folder
 						id="sidebar-pinned-notes"
 						bind:open={showPinnedNotes}
