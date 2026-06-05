@@ -164,26 +164,25 @@ def get_password_hash(password: str) -> str:
 
 
 async def ensure_local_admin_user(db=None):
-    admin_email = 'admin@localhost'
-    admin_password = 'admin'
+    guest_email = 'guest@localhost'
+    guest_password = 'guest'
 
-    user = await Users.get_user_by_email(admin_email, db=db)
+    user = await Users.get_user_by_email(guest_email, db=db)
     if user is None:
         user = await Auths.insert_new_auth(
-            email=admin_email,
-            password=get_password_hash(admin_password),
-            name='管理员',
-            role='admin',
+            email=guest_email,
+            password=get_password_hash(guest_password),
+            name='游客',
+            role='user',
             db=db,
         )
-    elif user.role != 'admin':
-        user = await Users.update_user_role_by_id(user.id, 'admin', db=db)
+    elif user.role != 'user':
+        user = await Users.update_user_role_by_id(user.id, 'user', db=db)
 
     if user is None:
         raise HTTPException(status_code=500, detail=ERROR_MESSAGES.CREATE_USER_ERROR)
 
     return user
-
 
 def validate_password(password: str) -> bool:
     # The password passed to bcrypt must be 72 bytes or fewer. If it is longer, it will be truncated before hashing.
@@ -333,8 +332,9 @@ async def get_current_user(
     if token is None and hasattr(request.state, 'token') and request.state.token:
         token = request.state.token.credentials
 
-    if token is None and not WEBUI_AUTH:
+    if not WEBUI_AUTH:
         user = await ensure_local_admin_user()
+
         import asyncio
 
         asyncio.create_task(Users.update_last_active_by_id(user.id))

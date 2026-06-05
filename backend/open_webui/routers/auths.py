@@ -177,7 +177,7 @@ async def get_session_user(
         token = request.cookies.get('token')
     if token is None and getattr(request.state, 'token', None):
         token = request.state.token.credentials
-    if token is None and not WEBUI_AUTH:
+    if not WEBUI_AUTH:
         return await create_session_response(request, user, db, response, set_cookie=True)
     data = decode_token(token) if token else None
 
@@ -761,7 +761,6 @@ async def signup(
     except Exception as err:
         log.error(f'Signup error: {str(err)}')
         raise HTTPException(500, detail='An internal error occurred during signup.')
-
 
 @router.post('/signout')
 async def signout(request: Request, response: Response, db: AsyncSession = Depends(get_async_session)):
