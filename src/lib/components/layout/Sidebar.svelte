@@ -1014,7 +1014,7 @@
 					draggable="false"
 					on:click={newChatHandler}
 				>
-					<span class="text-xs font-semibold text-gray-700 dark:text-gray-200">职</span>
+					<img src="/favicon.png" alt="logo" class="size-7 rounded-md object-contain" />
 				</a>
 
 				<a href="/" class="flex flex-1 px-0.5" on:click={newChatHandler}>

@@ -27,7 +27,7 @@
 					}
 				}}
 			>
-				<span class="flex size-11 items-center justify-center text-sm font-semibold">职</span>
+				<img src="/favicon.png" alt="logo" class="size-9 rounded-lg object-contain" />
 			</button>
 		</Tooltip>
 	</div>
