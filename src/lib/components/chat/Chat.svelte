@@ -490,10 +490,7 @@
 	const chatEventHandler = async (event, cb) => {
 		console.log(event);
 
-		const hasLocalMessage = Boolean(history.messages[event.message_id]);
-		const isCurrentChatEvent = event.chat_id === $chatId || hasLocalMessage;
-
-		if (isCurrentChatEvent) {
+		if (event.chat_id === $chatId) {
 			await tick();
 			let message = history.messages[event.message_id];
 
@@ -882,25 +879,25 @@
 		};
 		init();
 
-			return () => {
-				try {
-					clearTimeout(saveControlsTimer);
-					saveControls();
-					if (chatIdProp && !$temporaryChatEnabled) {
-						updateLastReadAt(chatIdProp);
-					}
-					pageSubscribe();
-					showControlsSubscribe();
-					selectedFolderSubscribe();
-					window.removeEventListener('message', onMessageHandler);
-					$socket?.off('events', chatEventHandler);
-					audioQueueInstance?.destroy();
-					audioQueue.set(null);
-				} catch (e) {
-					console.error(e);
+		return () => {
+			try {
+				clearTimeout(saveControlsTimer);
+				saveControls();
+				if (chatIdProp && !$temporaryChatEnabled) {
+					updateLastReadAt(chatIdProp);
 				}
-			};
-		});
+				pageSubscribe();
+				showControlsSubscribe();
+				selectedFolderSubscribe();
+				window.removeEventListener('message', onMessageHandler);
+				$socket?.off('events', chatEventHandler);
+				audioQueueInstance?.destroy();
+				audioQueue.set(null);
+			} catch (e) {
+				console.error(e);
+			}
+		};
+	});
 
 	// File upload functions
 
