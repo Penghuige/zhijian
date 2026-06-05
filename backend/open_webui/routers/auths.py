@@ -650,6 +650,16 @@ async def signin(
         raise HTTPException(400, detail=ERROR_MESSAGES.INVALID_CRED)
 
 
+@router.post('/guest', response_model=SessionUserResponse)
+async def guest_signin(
+    request: Request,
+    response: Response,
+    db: AsyncSession = Depends(get_async_session),
+):
+    user = await ensure_local_admin_user(db=db)
+    return await create_session_response(request, user, db, response, set_cookie=True)
+
+
 ############################
 # SignUp
 ############################

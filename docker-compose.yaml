@@ -31,8 +31,8 @@ services:
       OLLAMA_BASE_URLS: ''
       WEBUI_SECRET_KEY: ''
       WEBUI_NAME: 职鉴
-      WEBUI_AUTH: 'false'
-      ENABLE_LOGIN_FORM: 'false'
+      WEBUI_AUTH: 'true'
+      ENABLE_LOGIN_FORM: 'true'
       ENABLE_SIGNUP: 'false'
       DEFAULT_USER_ROLE: user
       OFFLINE_MODE: 'true'
