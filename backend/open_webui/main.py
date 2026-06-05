@@ -2387,7 +2387,7 @@ async def get_app_config(request: Request):
 
     onboarding = False
     if user is None:
-        onboarding = not await Users.has_users()
+        onboarding = await Users.get_super_admin_user() is None
 
     user_count = await Users.get_num_users() if app.state.LICENSE_METADATA else None
 

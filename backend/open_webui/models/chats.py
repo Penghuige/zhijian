@@ -842,30 +842,6 @@ class ChatTable:
 
         return await SharedChats.get_by_user_id(user_id, filter=filter, skip=skip, limit=limit, db=db)
 
-    def _count_user_messages_in_chat_payload(self, chat: dict) -> int:
-        if not isinstance(chat, dict):
-            return 0
-
-        history = chat.get('history') if isinstance(chat.get('history'), dict) else {}
-        history_messages = history.get('messages') if isinstance(history, dict) else None
-        if isinstance(history_messages, dict):
-            return sum(
-                1
-                for message in history_messages.values()
-                if isinstance(message, dict) and message.get('role') == 'user'
-            )
-
-        messages = chat.get('messages')
-        if isinstance(messages, list):
-            return sum(1 for message in messages if isinstance(message, dict) and message.get('role') == 'user')
-
-        return 0
-
-    async def count_user_messages_by_user_id(self, user_id: str, db: AsyncSession | None = None) -> int:
-        async with get_async_db_context(db) as session:
-            result = await session.execute(select(Chat.chat).filter_by(user_id=user_id))
-            return sum(self._count_user_messages_in_chat_payload(chat) for (chat,) in result.all())
-
     async def get_chat_list_by_user_id(
         self,
         user_id: str,

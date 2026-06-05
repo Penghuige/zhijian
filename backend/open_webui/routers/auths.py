@@ -697,9 +697,9 @@ async def signup_handler(
     if not user:
         raise HTTPException(500, detail=ERROR_MESSAGES.CREATE_USER_ERROR)
 
-    # Atomically check if this is the only user *after* the insert.
-    # Only the single user present at this point should become admin.
-    if await Users.get_num_users(db=db) == 1:
+    # Bootstrap the first available admin even if non-admin users
+    # (for example a guest account) already exist.
+    if await Users.get_super_admin_user(db=db) is None:
         await Users.update_user_role_by_id(user.id, 'admin', db=db)
         user = await Users.get_user_by_id(user.id, db=db)
         request.app.state.config.ENABLE_SIGNUP = False
@@ -733,12 +733,14 @@ async def signup(
     db: AsyncSession = Depends(get_async_session),
 ):
     has_users = await Users.has_users(db=db)
+    has_admin = await Users.get_super_admin_user(db=db) is not None
 
     if WEBUI_AUTH:
-        if has_users:
+        if has_admin:
             if not request.app.state.config.ENABLE_SIGNUP or not request.app.state.config.ENABLE_LOGIN_FORM:
                 raise HTTPException(status.HTTP_403_FORBIDDEN, detail=ERROR_MESSAGES.ACCESS_PROHIBITED)
-        # Don't gate the first admin on ENABLE_SIGNUP: it auto-disables and can persist stale across a DB reset.
+        # Don't gate bootstrap admin creation on ENABLE_SIGNUP: it auto-disables
+        # and deployments may already contain guest/non-admin users.
         elif not request.app.state.config.ENABLE_LOGIN_FORM and not ENABLE_INITIAL_ADMIN_SIGNUP:
             raise HTTPException(status.HTTP_403_FORBIDDEN, detail=ERROR_MESSAGES.ACCESS_PROHIBITED)
     else:

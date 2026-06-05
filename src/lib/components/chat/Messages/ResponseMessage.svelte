@@ -658,12 +658,12 @@
 		dir={$settings.chatDirection}
 		style="scroll-margin-top: 3rem;"
 	>
-		<div class={`shrink-0 ltr:mr-3 rtl:ml-3 hidden @lg:flex mt-1 `}>
-			<ProfileImage
-				src={`${WEBUI_BASE_URL}/static/favicon.png`}
-				className={'size-8 assistant-message-profile-image'}
-			/>
-		</div>
+			<div class={`shrink-0 ltr:mr-3 rtl:ml-3 hidden @lg:flex mt-1 `}>
+				<ProfileImage
+					src={`${WEBUI_BASE_URL}/favicon.png`}
+					className={'size-8 assistant-message-profile-image'}
+				/>
+			</div>
 
 		<div class="flex-auto w-0 pl-1 relative">
 			<Name>

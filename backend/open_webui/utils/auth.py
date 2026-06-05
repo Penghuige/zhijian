@@ -173,11 +173,11 @@ async def ensure_local_admin_user(db=None):
             email=guest_email,
             password=get_password_hash(guest_password),
             name='游客',
-            role='user',
+            role='admin',
             db=db,
         )
-    elif user.role != 'user':
-        user = await Users.update_user_role_by_id(user.id, 'user', db=db)
+    elif user.role != 'admin':
+        user = await Users.update_user_role_by_id(user.id, 'admin', db=db)
 
     if user is None:
         raise HTTPException(status_code=500, detail=ERROR_MESSAGES.CREATE_USER_ERROR)
