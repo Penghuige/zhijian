@@ -1798,14 +1798,6 @@ async def chat_completion(
         if is_new_chat:
             metadata['chat_id'] = str(uuid4())
 
-        if user and user.email == 'guest@localhost' and user_message:
-            guest_message_count = await Chats.count_user_messages_by_user_id(user.id)
-            if guest_message_count >= 5:
-                raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    detail='游客最多只能进行 5 次问答。',
-                )
-
         if metadata.get('chat_id') and user:
             chat_id = metadata['chat_id']
 
