@@ -178,6 +178,7 @@
 	};
 
 	let taskIds = null;
+	let boundSocket = null;
 
 	// Chat Input
 	let prompt = '';
@@ -487,6 +488,16 @@
 		}
 	};
 
+	const bindChatSocket = (nextSocket) => {
+		if (boundSocket === nextSocket) {
+			return;
+		}
+
+		boundSocket?.off('events', chatEventHandler);
+		boundSocket = nextSocket;
+		boundSocket?.on('events', chatEventHandler);
+	};
+
 	const chatEventHandler = async (event, cb) => {
 		console.log(event);
 
@@ -766,11 +777,12 @@
 		} catch {}
 	};
 
+	$: bindChatSocket($socket);
+
 	onMount(() => {
 		loading = true;
 		console.log('mounted');
 		window.addEventListener('message', onMessageHandler);
-		$socket?.on('events', chatEventHandler);
 
 		$audioQueue?.destroy();
 
@@ -882,25 +894,25 @@
 		};
 		init();
 
-		return () => {
-			try {
-				clearTimeout(saveControlsTimer);
-				saveControls();
-				if (chatIdProp && !$temporaryChatEnabled) {
-					updateLastReadAt(chatIdProp);
+			return () => {
+				try {
+					clearTimeout(saveControlsTimer);
+					saveControls();
+					if (chatIdProp && !$temporaryChatEnabled) {
+						updateLastReadAt(chatIdProp);
+					}
+					pageSubscribe();
+					showControlsSubscribe();
+					selectedFolderSubscribe();
+					window.removeEventListener('message', onMessageHandler);
+					boundSocket?.off('events', chatEventHandler);
+					audioQueueInstance?.destroy();
+					audioQueue.set(null);
+				} catch (e) {
+					console.error(e);
 				}
-				pageSubscribe();
-				showControlsSubscribe();
-				selectedFolderSubscribe();
-				window.removeEventListener('message', onMessageHandler);
-				$socket?.off('events', chatEventHandler);
-				audioQueueInstance?.destroy();
-				audioQueue.set(null);
-			} catch (e) {
-				console.error(e);
-			}
-		};
-	});
+			};
+		});
 
 	// File upload functions
 
