@@ -1,7 +1,13 @@
 {
   "name": "职鉴",
   "short_name": "职鉴",
-  "icons": [],
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
   "theme_color": "#ffffff",
   "background_color": "#ffffff",
   "display": "standalone"
