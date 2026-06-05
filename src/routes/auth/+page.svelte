@@ -124,6 +124,10 @@
 	};
 
 	const oauthCallbackHandler = async () => {
+		if ($page.url.searchParams.get('logout') === '1') {
+			return;
+		}
+
 		// Get the value of the 'token' cookie
 		function getCookie(name) {
 			const match = document.cookie.match(

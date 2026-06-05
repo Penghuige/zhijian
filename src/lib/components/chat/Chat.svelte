@@ -178,7 +178,6 @@
 	};
 
 	let taskIds = null;
-	let boundSocket = null;
 
 	// Chat Input
 	let prompt = '';
@@ -488,34 +487,6 @@
 		}
 	};
 
-	const bindChatSocket = (nextSocket) => {
-		if (boundSocket === nextSocket) {
-			return;
-		}
-
-		boundSocket?.off('events', chatEventHandler);
-		boundSocket = nextSocket;
-		boundSocket?.on('events', chatEventHandler);
-	};
-
-	const waitForSocketReady = async (timeoutMs = 8000) => {
-		const start = Date.now();
-
-		while (Date.now() - start < timeoutMs) {
-			const currentSocket = get(socket);
-			if (currentSocket?.connected) {
-				if (localStorage.token) {
-					currentSocket.emit('user-join', { auth: { token: localStorage.token } });
-				}
-				return true;
-			}
-
-			await new Promise((resolve) => setTimeout(resolve, 100));
-		}
-
-		return false;
-	};
-
 	const chatEventHandler = async (event, cb) => {
 		console.log(event);
 
@@ -795,12 +766,11 @@
 		} catch {}
 	};
 
-	$: bindChatSocket($socket);
-
 	onMount(() => {
 		loading = true;
 		console.log('mounted');
 		window.addEventListener('message', onMessageHandler);
+		$socket?.on('events', chatEventHandler);
 
 		$audioQueue?.destroy();
 
@@ -923,7 +893,7 @@
 					showControlsSubscribe();
 					selectedFolderSubscribe();
 					window.removeEventListener('message', onMessageHandler);
-					boundSocket?.off('events', chatEventHandler);
+					$socket?.off('events', chatEventHandler);
 					audioQueueInstance?.destroy();
 					audioQueue.set(null);
 				} catch (e) {
@@ -2308,18 +2278,6 @@
 	) => {
 		const responseMessage = _history.messages[responseMessageId];
 		const userMessage = _history.messages[responseMessage.parentId];
-
-		const socketReady = await waitForSocketReady();
-		if (!socketReady) {
-			responseMessage.error = {
-				content: $i18n.t('Connection to the server is not ready yet. Please try again in a moment.')
-			};
-			responseMessage.done = true;
-			history.messages[responseMessageId] = responseMessage;
-			history.currentId = responseMessageId;
-			toast.error(responseMessage.error.content);
-			return;
-		}
 
 		const chatMessageFiles = _messages
 			.filter((message) => message.files)
